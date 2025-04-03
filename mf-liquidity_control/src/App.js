@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Layout } from "antd";
 
@@ -13,12 +13,22 @@ import CashReserves from "./pages/CashReserves";
 import CashSweeping from "./pages/CashSweeping";
 
 const App = () => {
+  const [collapsed, setCollapsed] = useState(false);
+  
   return (
     <Router>
       <Layout style={{ minHeight: "100vh" }}>
-        <Sidebar />
-        <Layout>
-          <Header />
+        <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+        <Layout
+          className="main-layout"
+          style={{
+            marginLeft: collapsed ? 0 : 250,
+            transition: "margin-left 0.3s ease-in-out",
+            background: "#fff",
+            minHeight: "100vh",
+          }}
+        >
+          <Header collapsed={collapsed} setCollapsed={setCollapsed} />
           <Content>
             <Routes>
               <Route path="/cash-flow" element={<CashFlow />} />

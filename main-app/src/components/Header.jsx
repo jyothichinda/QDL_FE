@@ -1,6 +1,6 @@
 import React from "react";
 import { Layout, Avatar, Button } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { UserOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 
 const { Header } = Layout;
 
@@ -40,7 +40,7 @@ const AppHeader = ({ collapsed, setCollapsed }) => {
           color: "#fff",
         }}
       >
-        Data Control
+        Quantum Data Leap
       </div>
       <Avatar
         size="large"

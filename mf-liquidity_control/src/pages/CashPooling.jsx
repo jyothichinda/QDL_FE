@@ -139,7 +139,104 @@ const SortableItem = ({ column, isChecked, onToggle }) => {
   );
 };
 
-const PoolingTable = ({ data, fetchData }) => {
+const PoolingTable = ({ data =[
+  {
+    "id": 1,
+    "pool_name": "Check",
+    "master_account": "Test",
+    "currency": "USD",
+    "participating_accounts": [
+      "XYZ",
+      "ABC",
+      "JYP"
+    ],
+    "status": "Active",
+    "next_execution": [2025, 3, 19, 18, 30],
+    "balance": 0,
+    "liquidity_threshold": 10000,
+    "interest": "15",
+    "auto_rebalancing": "yes"
+  },
+  {
+    "id": 2,
+    "pool_name": "Regional Pool - Europe",
+    "master_account": "Euro Bank - 102",
+    "currency": "USD",
+    "participating_accounts": [
+      "account1",
+      "account2",
+      "account3"
+    ],
+    "status": "ACTIVE",
+    "next_execution": [2025, 3, 20, 14, 30],
+    "balance": 50000,
+    "liquidity_threshold": 10000,
+    "interest": "5%",
+    "auto_rebalancing": "enabled"
+  },
+  {
+    "id": 3,
+    "pool_name": "Check 1",
+    "master_account": "Test 1",
+    "currency": "USD",
+    "participating_accounts": [
+      "INRIOP",
+      "JKLOP"
+    ],
+    "status": "Active",
+    "next_execution": [2025, 3, 19, 18, 30],
+    "balance": 0,
+    "liquidity_threshold": 1890,
+    "interest": "12",
+    "auto_rebalancing": "yes"
+  },
+  {
+    "id": 4,
+    "pool_name": "Check 5",
+    "master_account": "Test 5",
+    "currency": "USD",
+    "participating_accounts": [
+      "ASD",
+      "GHJ"
+    ],
+    "status": "Active",
+    "next_execution": [2025, 3, 27, 18, 30],
+    "balance": 0,
+    "liquidity_threshold": 10000,
+    "interest": "15",
+    "auto_rebalancing": "yes"
+  },
+  {
+    "id": 5,
+    "pool_name": "Check 10",
+    "master_account": "Test 10",
+    "currency": "INR",
+    "participating_accounts": [
+      "UIO"
+    ],
+    "status": "Active",
+    "next_execution": [2025, 3, 21, 18, 30],
+    "balance": 0,
+    "liquidity_threshold": 1500,
+    "interest": "16",
+    "auto_rebalancing": "yes"
+  },
+  {
+    "id": 6,
+    "pool_name": "A",
+    "master_account": "AB",
+    "currency": "USD",
+    "participating_accounts": [
+      "BC"
+    ],
+    "status": "Active",
+    "next_execution": [2025, 3, 28, 18, 30],
+    "balance": 0,
+    "liquidity_threshold": 1,
+    "interest": "0.1",
+    "auto_rebalancing": "yes"
+  }
+] , fetchData }) => {
   // Load preferences from local storage
   const savedColumns =
     JSON.parse(localStorage.getItem("selectedColumns")) ||

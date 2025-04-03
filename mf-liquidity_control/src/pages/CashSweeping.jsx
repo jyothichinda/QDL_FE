@@ -134,7 +134,112 @@ const SortableItem = ({ column, isChecked, onToggle }) => {
   );
 };
 
-const SweepingTable = ({ data, fetchData }) => {
+const SweepingTable = ({ data= [
+  {
+    "id": 4,
+    "sweep_name": "Weekly Sweep - XYZ Ltd",
+    "master_account": "XYZ Bank - 002",
+    "sweep_direction": "Bi-Directional",
+    "frequency": "Weekly",
+    "status": "Inactive",
+    "threshold_limit": 5000,
+    "currency": "EUR",
+    "action": "View",
+    "enable_auto_transfer": "YES",
+    "next_execution": [2025, 3, 19, 18, 30]
+  },
+  {
+    "id": 1,
+    "sweep_name": "Test",
+    "master_account": "Check",
+    "sweep_direction": "onewaydirection",
+    "frequency": "daily",
+    "status": "active",
+    "threshold_limit": 1000,
+    "currency": "USD",
+    "action": null,
+    "enable_auto_transfer": "yes",
+    "next_execution": [2025, 3, 19, 18, 30]
+  },
+  {
+    "id": 2,
+    "sweep_name": "Test 2",
+    "master_account": "Check2",
+    "sweep_direction": "onewaydirection",
+    "frequency": "Weekly",
+    "status": "active",
+    "threshold_limit": 2000,
+    "currency": "USD",
+    "action": null,
+    "enable_auto_transfer": "no",
+    "next_execution": [2025, 3, 21, 18, 30]
+  },
+  {
+    "id": 3,
+    "sweep_name": "Test 3",
+    "master_account": "Check 3",
+    "sweep_direction": "onewaydirection",
+    "frequency": "Monthly",
+    "status": "active",
+    "threshold_limit": 3000,
+    "currency": "USD",
+    "action": null,
+    "enable_auto_transfer": "yes",
+    "next_execution": [2025, 3, 30, 18, 30]
+  },
+  {
+    "id": 5,
+    "sweep_name": "Test 4",
+    "master_account": "Check 4",
+    "sweep_direction": "onewaydirection",
+    "frequency": "Daily",
+    "status": "active",
+    "threshold_limit": 1590,
+    "currency": "INR",
+    "action": null,
+    "enable_auto_transfer": "yes",
+    "next_execution": [2025, 3, 25, 18, 30]
+  },
+  {
+    "id": 6,
+    "sweep_name": "ABC",
+    "master_account": "AB",
+    "sweep_direction": "onewaydirection",
+    "frequency": "10",
+    "status": "active",
+    "threshold_limit": 200000,
+    "currency": "USD",
+    "action": null,
+    "enable_auto_transfer": "yes",
+    "next_execution": [2025, 3, 28, 18, 30]
+  },
+  {
+    "id": 7,
+    "sweep_name": "A",
+    "master_account": "BC",
+    "sweep_direction": "biwaydirection",
+    "frequency": "Weekly",
+    "status": "active",
+    "threshold_limit": 20000,
+    "currency": "INR",
+    "action": null,
+    "enable_auto_transfer": "yes",
+    "next_execution": [2025, 3, 29, 18, 30]
+  },
+  {
+    "id": 8,
+    "sweep_name": "B",
+    "master_account": "CSA",
+    "sweep_direction": "onewaydirection",
+    "frequency": "Weekly",
+    "status": "active",
+    "threshold_limit": 20000,
+    "currency": "INR",
+    "action": null,
+    "enable_auto_transfer": "yes",
+    "next_execution": [2025, 3, 30, 18, 30]
+  }
+], fetchData }) => {
   // Load preferences from local storage
   const savedColumns =
     JSON.parse(localStorage.getItem("selectedColumns")) ||

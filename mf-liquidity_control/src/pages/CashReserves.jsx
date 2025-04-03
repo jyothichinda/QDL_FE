@@ -122,25 +122,39 @@ const SortableItem = ({ column, isChecked, onToggle }) => {
 const ReservesTable = ({
   data = [
     {
-      reserve_name: "Emergency Fund",
-      master_account: "XYZ LTD",
-      currency: "USD",
-      reserved_amount: 500,
-      minimum_required: 100,
-      status: "Completed",
-      last_updated: "03/03/2025 11:35:27",
-      auto_refill: "yes",
+      "id": 1,
+      "reserve_name": "Reserve 1",
+      "master_account": "MasterAccount1",
+      "currency": "USD",
+      "reserved_amount": 500000,
+      "minimum_required": 10000,
+      "status": "Active",
+      "last_updated": [2025, 3, 19, 14, 30],
+      "auto_refill": "Yes"
     },
     {
-      reserve_name: "Tax Reserve Fund",
-      master_account: "DEF LTD",
-      currency: "INR",
-      reserved_amount: 400,
-      minimum_required: 170,
-      status: "Pending",
-      last_updated: "03/03/2025 11:35:27",
-      auto_refill: "no",
+      "id": 2,
+      "reserve_name": "Test",
+      "master_account": "Test",
+      "currency": "USD",
+      "reserved_amount": 10000,
+      "minimum_required": 7000,
+      "status": "Active",
+      "last_updated": null,
+      "auto_refill": "yes"
     },
+    {
+      "id": 3,
+      "reserve_name": "Test",
+      "master_account": "Check",
+      "currency": "USD",
+      "reserved_amount": 10000,
+      "minimum_required": 5000,
+      "status": "InActive",
+      "last_updated": [2025, 3, 19, 16, 13, 18, 35422000],
+      "auto_refill": "yes"
+    }
+  
   ],
 }) => {
   // Load preferences from local storage

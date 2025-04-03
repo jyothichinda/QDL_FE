@@ -13,7 +13,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
+} from "@dnd-kit/core"; 
 import {
   SortableContext,
   verticalListSortingStrategy,

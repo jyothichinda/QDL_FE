@@ -139,7 +139,7 @@ const SortableItem = ({ column, isChecked, onToggle }) => {
     backgroundColor: isChecked ? "#e6f7ff" : "#f0f0f0",
     borderRadius: 5,
   };
-
+  
   return (
     <Card ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>

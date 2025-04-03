@@ -4,7 +4,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.m?js$/,
+        test: /\.m?jsx?$/,
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
@@ -14,7 +14,14 @@ module.exports = {
           },
         },
       },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
     ],
+  },
+  resolve: {
+    extensions: [".js", ".jsx"], // Add this line to resolve .jsx files
   },
   plugins: [
     new HtmlWebpackPlugin({

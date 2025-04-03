@@ -119,7 +119,30 @@ const SortableItem = ({ column, isChecked, onToggle }) => {
   );
 };
 
-const ReservesTable = ({ data, fetchData }) => {
+const ReservesTable = ({
+  data = [
+    {
+      reserve_name: "Emergency Fund",
+      master_account: "XYZ LTD",
+      currency: "USD",
+      reserved_amount: 500,
+      minimum_required: 100,
+      status: "Completed",
+      last_updated: "03/03/2025 11:35:27",
+      auto_refill: "yes",
+    },
+    {
+      reserve_name: "Tax Reserve Fund",
+      master_account: "DEF LTD",
+      currency: "INR",
+      reserved_amount: 400,
+      minimum_required: 170,
+      status: "Pending",
+      last_updated: "03/03/2025 11:35:27",
+      auto_refill: "no",
+    },
+  ],
+}) => {
   // Load preferences from local storage
   const savedColumns =
     JSON.parse(localStorage.getItem("selectedColumns")) ||
@@ -178,6 +201,16 @@ const ReservesTable = ({ data, fetchData }) => {
   );
 
   const [form] = Form.useForm();
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(URL);
+      setData(response.data); // Assuming the response data is in the correct format
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      message.error("Failed to fetch data!");
+    }
+  };
 
   const handleSubmit = async (values) => {
     try {

@@ -1,0 +1,36 @@
+.table-wrapper {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .table-container {
+    transition: transform 0.5s ease-in-out;
+    width: 100%;
+  }
+  
+  .slide-out-right {
+    transform: translateX(100%);
+  }
+  
+  .slide-in-from-left {
+    transform: translateX(0);
+  }
+  
+  /* Initial position for new content before sliding in */
+  .table-container:not(.slide-out-right):not(.slide-in-from-left) {
+    transform: translateX(0);
+  }
+  
+  /* Position new content off-screen left before animation */
+  .table-container.slide-in-from-left {
+    animation: slideInFromLeft 0.5s ease-in-out forwards;
+  }
+  
+  @keyframes slideInFromLeft {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }

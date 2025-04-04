@@ -12,7 +12,7 @@ const combinedDependencies = {
 const devConfig = {
   mode: "development",
   devServer: {
-    port: 3003,
+    port: 3002,
     historyApiFallback: true,
   },
   module: {

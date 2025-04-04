@@ -1,9 +1,10 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+
 module.exports = {
   module: {
     rules: [
       {
-        test: /\.m?js$/,
+        test: /\.m?jsx?$/, // Updated to support both .js and .jsx files
         exclude: /node_modules/,
         use: {
           loader: "babel-loader",
@@ -18,6 +19,9 @@ module.exports = {
         use: ["style-loader", "css-loader"],
       },
     ],
+  },
+  resolve: {
+    extensions: [".js", ".jsx"], // Add this line to resolve .jsx files
   },
   plugins: [
     new HtmlWebpackPlugin({

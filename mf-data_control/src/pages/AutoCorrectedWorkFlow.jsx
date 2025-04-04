@@ -23,7 +23,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import axios from "axios";
  
-import {data} from '../utils/dummydata'
+import data from '../utils/dummydata'
  
 const allColumns = [
   {

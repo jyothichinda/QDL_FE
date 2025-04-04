@@ -7,14 +7,16 @@ const ChatInterface = ({ control }) => {
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [isHistoryVisible, setIsHistoryVisible] = useState(false);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [chartType, setChartType] = useState("pie");
 
-  // Static queries for each page
-  const staticQueries = {
-    "Repair Workflow": ["Query 1 for Repair", "Query 2 for Repair", "Query 3 for Repair"],
-    "AutoCorrect Workflow": ["Query 1 for AutoCorrect", "Query 2 for AutoCorrect", "Query 3 for AutoCorrect"],
-    "Fraud Control": ["Query 1 for Fraud", "Query 2 for Fraud", "Query 3 for Fraud"],
-  };
+  const availableColors = [
+    "#10457D",
+    "#215B97",
+    "#3E6EA0",
+    "#073666",
+    "#03274B",
+  ];
 
   // Load messages from localStorage for the current page
   useEffect(() => {

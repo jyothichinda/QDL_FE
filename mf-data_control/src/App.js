@@ -7,6 +7,7 @@ import Header from "./components/Header";
 import Content from "./components/Content";
 import ChatInterface from "./components/ChatInterface";
 
+import Dashboard from "./pages/Dashboard";
 import RepairWorkflow from "./pages/RepairWorkflow";
 import AutoCorrectedWorkflow from "./pages/AutoCorrectedWorkflow";
 import NetworkResolution from "./pages/NetworkResolution";
@@ -47,6 +48,7 @@ const App = () => {
                 path="/"
                 element={<h2>Select a module from the sidebar</h2>}
               />
+              <Route path="/" element={<Dashboard />} />
             </Routes>
           </Content>
           <ChatInterface />

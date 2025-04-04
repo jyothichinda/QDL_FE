@@ -107,7 +107,6 @@ const SortableItem = ({ column, isChecked, onToggle }) => {
     cursor: "grab",
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
     backgroundColor: isChecked ? "#e6f7ff" : "#f0f0f0",
     borderRadius: 5,
   };
@@ -306,9 +305,9 @@ const PoolingTable = ({
       <div
         style={{
           display: "flex",
-      justifyContent: "space-between", // Align buttons to the right
-      alignItems: "center",
-      marginBottom: "10px",
+          justifyContent: "flex-end",
+          alignItems: "center",
+          marginBottom: "10px",
         }}
       >
         <Button
@@ -316,7 +315,7 @@ const PoolingTable = ({
           type="primary"
           onClick={() => setCreateModalVisible(true)}
           style={{ marginRight: "10px" }}
-          
+
         >
           Create
         </Button>

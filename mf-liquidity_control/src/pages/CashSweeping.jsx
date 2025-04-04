@@ -61,7 +61,6 @@ const SortableItem = ({ column, isChecked, onToggle }) => {
     cursor: "grab",
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
     backgroundColor: isChecked ? "#e6f7ff" : "#f0f0f0",
     borderRadius: 5,
   };

@@ -6,7 +6,7 @@ import Sidebar from "./components/SideBar";
 import Header from "./components/Header";
 import Content from "./components/Content";
 import ChatInterface from "./components/ChatInterface";
-
+import Dashboard from "./pages/Dashboard";
 import NetworkResolution from "./pages/NetworkResolution";
 
 const App = () => {
@@ -33,10 +33,7 @@ const App = () => {
                 element={<NetworkResolution />}
               />
 
-              <Route
-                path="/"
-                element={<h2>Select a module from the sidebar</h2>}
-              />
+              <Route path="/" element={<Dashboard />} />
             </Routes>
           </Content>
           <ChatInterface />

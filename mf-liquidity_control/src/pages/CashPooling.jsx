@@ -335,14 +335,17 @@ const PoolingTable = ({ data =[
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: "10px",
+      justifyContent: "space-between", // Align buttons to the right
+      alignItems: "center",
+      marginBottom: "10px",
         }}
       >
         <Button
           icon={<EditOutlined />}
           type="primary"
           onClick={() => setCreateModalVisible(true)}
+          style={{ marginRight: "10px" }}
+          
         >
           Create
         </Button>
@@ -542,7 +545,8 @@ const PoolingTable = ({ data =[
           ...record,
           key: record.id || index, // Ensure key is unique
         }))}
-        rowKey="key" // Explicitly tell AntD which field is the unique key
+        rowKey="key"
+        style={{ width: "100%" }} // Explicitly tell AntD which field is the unique key
       />
     </div>
   );

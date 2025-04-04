@@ -9,7 +9,8 @@ const ChatInterface = ({ control }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [dashboardData, setDashboardData] = useState(null);
   const [chartType, setChartType] = useState("pie");
-
+  const [isHistoryVisible, setIsHistoryVisible] = useState(false); // Define the state for history visibility
+  
   const availableColors = [
     "#10457D",
     "#215B97",

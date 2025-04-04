@@ -7,6 +7,8 @@ import Header from "./components/Header";
 import Content from "./components/Content";
 import ChatInterface from "./components/ChatInterface";
 
+import RepairWorkflow from "./pages/RepairWorkflow";
+import AutoCorrectedWorkflow from "./pages/AutoCorrectedWorkflow";
 import NetworkResolution from "./pages/NetworkResolution";
 
 const App = () => {
@@ -31,6 +33,14 @@ const App = () => {
               <Route
                 path="/network-resolution"
                 element={<NetworkResolution />}
+              />
+              <Route
+                path="/auto-corrected-workflow"
+                element={<AutoCorrectedWorkflow />}
+              />
+              <Route
+                path="/repair-workflow"
+                element={<RepairWorkflow />}
               />
 
               <Route

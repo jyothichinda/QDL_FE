@@ -4,24 +4,22 @@ import { AiOutlineHistory, AiOutlineExport } from "react-icons/ai";
 import { Input, Button } from "antd";
 
 const ChatInterface = ({ control }) => {
+  // Static messages
+  const staticMessages = ["what are the networks that are down?"];
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [dashboardData, setDashboardData] = useState(null);
-  const [chartType, setChartType] = useState("pie");
+  const [isHistoryVisible, setIsHistoryVisible] = useState(false);
 
-  const availableColors = [
-    "#10457D",
-    "#215B97",
-    "#3E6EA0",
-    "#073666",
-    "#03274B",
-  ];
-
-  // Load messages from localStorage for the current page
+  // Load messages from localStorage for the current page or workflow
   useEffect(() => {
     const savedMessages = JSON.parse(localStorage.getItem(`${control}ChatHistory`) || "[]");
-    setMessages(savedMessages);
+    const combinedMessages = [
+      ...(Array.isArray(staticMessages) ? staticMessages : []),
+      ...(Array.isArray(savedMessages) ? savedMessages : []),
+    ]; // Combine static and saved messages
+    setMessages(combinedMessages); // Ensure `messages` is an array
+    console.log("Loaded messages from localStorage:", combinedMessages);
   }, [control]);
 
   // Save messages to localStorage whenever they change
@@ -36,9 +34,10 @@ const ChatInterface = ({ control }) => {
   };
 
   const sendMessage = async (text) => {
-    setMessages((prev) => [...prev, { sender: "user", text }]);
+    setMessages((prev) => (Array.isArray(prev) ? [...prev, text] : [text])); // Ensure `prev` is an array
     setUserInput("");
     setIsTyping(true);
+    setTimeout(() => setIsTyping(false), 1000); // Simulate typing delay
   };
 
   return (
@@ -111,11 +110,12 @@ const ChatInterface = ({ control }) => {
             title="History"
             onClick={() => setIsHistoryVisible((prev) => !prev)} // Toggle visibility
           />
+
           {isHistoryVisible && (
             <div
               style={{
                 position: "absolute",
-                bottom: "30px", // Position above the icon
+                bottom: "30px",
                 left: "0",
                 background: "#ffffff",
                 border: "1px solid #ddd",
@@ -123,21 +123,29 @@ const ChatInterface = ({ control }) => {
                 boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
                 padding: "10px",
                 zIndex: 1000,
+                width: "200px",
+                maxHeight: "200px",
+                overflowY: "auto",
               }}
             >
-              {staticQueries[control]?.map((query, index) => (
-                <div
-                  key={index}
-                  style={{
-                    padding: "5px 10px",
-                    cursor: "pointer",
-                    borderBottom: index !== staticQueries[control].length - 1 ? "1px solid #ddd" : "none",
-                  }}
-                  onClick={() => console.log(`Selected query: ${query}`)} // Handle query click
-                >
-                  {query}
-                </div>
-              ))}
+              {messages.length > 0 ? (
+                <ul style={{ listStyleType: "none", padding: "0", margin: "0" }}>
+                  {messages.map((msg, index) => (
+                    <li
+                      key={index}
+                      style={{
+                        padding: "5px 0",
+                        borderBottom: index !== messages.length - 1 ? "1px solid #eee" : "none",
+                        textTransform: "capitalize", // Optional: Capitalize the first letter
+                      }}
+                    >
+                      {msg}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p style={{ color: "#888", textAlign: "center" }}>No history available</p>
+              )}
             </div>
           )}
         </div>

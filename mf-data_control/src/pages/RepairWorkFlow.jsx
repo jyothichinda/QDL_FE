@@ -217,7 +217,7 @@ const RepairWorkFlowTable = () => {
           <SortableContext items={columnsOrder.map((col) => col.key)} strategy={verticalListSortingStrategy}>
             {columnsOrder.map((column) => (
               <SortableItem
-                rowKey={column.key} // Ensure each column has a unique key
+                ro={column.key} // Ensure each column has a unique key
                 column={column}
                 isChecked={selectedColumns.includes(column.key)}
                 onToggle={handleColumnToggle}

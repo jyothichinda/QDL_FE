@@ -1,4 +1,4 @@
-const data = {
+export default data = {
     "totalAmount": 9449068246.84001,
     "totalTransactions": 76,
     "paymentFiles": [
@@ -5754,5 +5754,3 @@ const data = {
       }
     ]
   }
-
-export default data;

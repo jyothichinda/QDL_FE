@@ -1,4 +1,5 @@
-import React from "react";
+// App.js
+import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Layout } from "antd";
 
@@ -7,12 +8,24 @@ import AppHeader from "./components/Header";
 import MainContent from "./components/Content";
 import ChatInterface from "./components/ChatInterface";
 import Dashboard from "./pages/Dashboard";
-
 import Anamoly from "./pages/AnamolyDetection";
-// import Sidebar from "./components/SideBar";
-
 
 const App = () => {
+  const [isChatActive, setIsChatActive] = useState(false);
+  const [initialQuery, setInitialQuery] = useState("");
+
+  const handleQuerySubmit = (query) => {
+    if (query.trim()) {
+      setInitialQuery(query);
+      setIsChatActive(true);
+    }
+  };
+
+  const handleChatClose = () => {
+    setIsChatActive(false);
+    setInitialQuery("");
+  };
+
   return (
     <Router>
       <Layout style={{ minHeight: "100vh" }}>
@@ -20,18 +33,25 @@ const App = () => {
         <Layout>
           <AppHeader />
           <MainContent>
-            <Routes>
-              <Route path="/anamoly" element={<Anamoly />} />
-              <Route
-                path="/"
-                element={<Dashboard/>}
+            {isChatActive ? (
+              <ChatInterface 
+                initialQuery={initialQuery} 
+                onClose={handleChatClose}
               />
-            </Routes>
+            ) : (
+              <Routes>
+                <Route path="/anamoly" element={<Anamoly />} />
+                <Route path="/" element={<Dashboard />} />
+              </Routes>
+            )}
           </MainContent>
-          <ChatInterface />
+          {!isChatActive && (
+            <ChatInterface onQuerySubmit={handleQuerySubmit} />
+          )}
         </Layout>
       </Layout>
     </Router>
   );
 };
+
 export default App;

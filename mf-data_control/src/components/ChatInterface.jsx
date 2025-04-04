@@ -5,17 +5,6 @@ import { Input, Button } from "antd";
 const ChatInterface = ({ control }) => {
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [dashboardData, setDashboardData] = useState(null);
-  const [chartType, setChartType] = useState("pie");
-
-  const availableColors = [
-    "#10457D",
-    "#215B97",
-    "#3E6EA0",
-    "#073666",
-    "#03274B",
-  ];
 
   useEffect(() => {
     const savedMessages = JSON.parse(

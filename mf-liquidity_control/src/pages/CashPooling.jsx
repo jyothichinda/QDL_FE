@@ -10,12 +10,15 @@ import {
   InputNumber,
   DatePicker,
   Select,
+  Dropdown,
+  Menu,
 } from "antd";
 import {
   SettingOutlined,
   MinusSquareOutlined,
   PlusSquareOutlined,
   EditOutlined,
+  FilterOutlined,
 } from "@ant-design/icons";
 import {
   DndContext,
@@ -139,7 +142,7 @@ const SortableItem = ({ column, isChecked, onToggle }) => {
   );
 };
 
-const PoolingTable = ({ data =[
+const PoolingTable = ({ data = [
   {
     "id": 1,
     "pool_name": "Check",
@@ -236,7 +239,7 @@ const PoolingTable = ({ data =[
     "interest": "0.1",
     "auto_rebalancing": "yes"
   }
-] , fetchData }) => {
+], fetchData }) => {
   // Load preferences from local storage
   const savedColumns =
     JSON.parse(localStorage.getItem("selectedColumns")) ||
@@ -248,6 +251,21 @@ const PoolingTable = ({ data =[
   const [columnsOrder, setColumnsOrder] = useState(savedOrder);
   const [modalVisible, setModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [filteredData, setFilteredData] = useState(data);
+  const [filters, setFilters] = useState({
+    poolName: "",
+    masterAccount: "",
+    currency: "",
+    participatingAccounts: "",
+    status: "",
+    nextExecution: null,
+    balance: "",
+    liquidityThreshold: "",
+    lastPoolUpdate: null,
+    interest: "",
+    autoRebalancing: "",
+  });
 
   // Persist preferences
   useEffect(() => {
@@ -255,14 +273,93 @@ const PoolingTable = ({ data =[
     localStorage.setItem("columnOrder", JSON.stringify(columnsOrder));
   }, [selectedColumns, columnsOrder]);
 
+  // Update filtered data when data or filters change
+  useEffect(() => {
+    let tempData = [...data];
+
+    if (filters.poolName) {
+      tempData = tempData.filter((item) =>
+        item.pool_name?.toLowerCase().includes(filters.poolName.toLowerCase())
+      );
+    }
+
+    if (filters.masterAccount) {
+      tempData = tempData.filter((item) =>
+        item.master_account?.toLowerCase().includes(filters.masterAccount.toLowerCase())
+      );
+    }
+
+    if (filters.currency) {
+      tempData = tempData.filter((item) =>
+        item.currency?.toLowerCase().includes(filters.currency.toLowerCase())
+      );
+    }
+
+    if (filters.participatingAccounts) {
+      tempData = tempData.filter((item) =>
+        item.participating_accounts?.some((account) =>
+          account.toLowerCase().includes(filters.participatingAccounts.toLowerCase())
+        )
+      );
+    }
+
+    if (filters.status) {
+      tempData = tempData.filter((item) =>
+        item.status?.toLowerCase() === filters.status.toLowerCase()
+      );
+    }
+
+    if (filters.nextExecution) {
+      tempData = tempData.filter((item) => {
+        if (!item.next_execution) return false;
+        const [year, month, day] = item.next_execution;
+        const executionDate = dayjs(`${year}-${month}-${day}`);
+        return executionDate.isSame(filters.nextExecution, "day");
+      });
+    }
+
+    if (filters.balance) {
+      tempData = tempData.filter((item) =>
+        item.balance?.toString().includes(filters.balance)
+      );
+    }
+
+    if (filters.liquidityThreshold) {
+      tempData = tempData.filter((item) =>
+        item.liquidity_threshold?.toString().includes(filters.liquidityThreshold)
+      );
+    }
+
+    if (filters.lastPoolUpdate) {
+      tempData = tempData.filter((item) => {
+        if (!item.update) return false;
+        return dayjs(item.update).isSame(filters.lastPoolUpdate, "day");
+      });
+    }
+
+    if (filters.interest) {
+      tempData = tempData.filter((item) =>
+        item.interest?.toString().includes(filters.interest)
+      );
+    }
+
+    if (filters.autoRebalancing) {
+      tempData = tempData.filter((item) =>
+        item.auto_rebalancing?.toLowerCase() === filters.autoRebalancing.toLowerCase()
+      );
+    }
+
+    setFilteredData(tempData);
+  }, [data, filters]);
+
   // Toggle column visibility
   const handleColumnToggle = (key) => {
     setSelectedColumns((prevSelectedColumns) => {
       const updatedColumns = prevSelectedColumns.includes(key)
-        ? prevSelectedColumns.filter((colKey) => colKey !== key) // Remove column when unchecked
-        : [...prevSelectedColumns, key]; // Add column when checked
+        ? prevSelectedColumns.filter((colKey) => colKey !== key)
+        : [...prevSelectedColumns, key];
 
-      console.log("Updated Columns:", updatedColumns); // Debugging log
+      console.log("Updated Columns:", updatedColumns);
       return updatedColumns;
     });
   };
@@ -295,6 +392,7 @@ const PoolingTable = ({ data =[
   );
 
   const [form] = Form.useForm();
+  const [filterForm] = Form.useForm();
 
   // Function to handle form submission
   const handleSubmit = async (values) => {
@@ -307,7 +405,6 @@ const PoolingTable = ({ data =[
       message.success("Pool saved successfully!");
       setCreateModalVisible(false);
       form.resetFields();
-      // Refresh data after successful creation to refresh table
       fetchData();
     } catch (error) {
       message.error("Failed to save pool!");
@@ -329,9 +426,59 @@ const PoolingTable = ({ data =[
     });
   };
 
+  // Handle filter form submission
+  const handleFilterSubmit = (values) => {
+    setFilters({
+      poolName: values.poolName || "",
+      masterAccount: values.masterAccount || "",
+      currency: values.currency || "",
+      participatingAccounts: values.participatingAccounts || "",
+      status: values.status || "",
+      nextExecution: values.nextExecution || null,
+      balance: values.balance || "",
+      liquidityThreshold: values.liquidityThreshold || "",
+      lastPoolUpdate: values.lastPoolUpdate || null,
+      interest: values.interest || "",
+      autoRebalancing: values.autoRebalancing || "",
+    });
+    setFilterModalVisible(false);
+  };
+
+  // Reset filters
+  const resetFilters = () => {
+    filterForm.resetFields();
+    setFilters({
+      poolName: "",
+      masterAccount: "",
+      currency: "",
+      participatingAccounts: "",
+      status: "",
+      nextExecution: null,
+      balance: "",
+      liquidityThreshold: "",
+      lastPoolUpdate: null,
+      interest: "",
+      autoRebalancing: "",
+    });
+  };
+
+  // Filter dropdown menu
+  const filterMenu = (
+    <Menu>
+      <Menu.Item key="filter">
+        <Button
+          onClick={() => setFilterModalVisible(true)}
+          style={{ border: "none", boxShadow: "none" }}
+        >
+          Open Filter Modal
+        </Button>
+      </Menu.Item>
+    </Menu>
+  );
+
   return (
     <div style={{ padding: "20px" }}>
-      {/* Settings Button */}
+      {/* Buttons Section */}
       <div
         style={{
           display: "flex",
@@ -354,6 +501,15 @@ const PoolingTable = ({ data =[
         >
           Customize
         </Button>
+        <Dropdown overlay={filterMenu} trigger={["click"]}>
+          <Button
+            icon={<FilterOutlined />}
+            Wtype="primary"
+            style={{ marginLeft: "10px" }}
+          >
+            Filters
+          </Button>
+        </Dropdown>
       </div>
 
       {/* Customization Modal */}
@@ -394,11 +550,13 @@ const PoolingTable = ({ data =[
           </SortableContext>
         </DndContext>
       </Modal>
+
+      {/* Create Pool Modal */}
       <Modal
         title="Create Pool"
         open={createModalVisible}
         onCancel={() => setCreateModalVisible(false)}
-        footer={null} // Footer removed since it's inside the form now
+        footer={null}
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Form.Item
@@ -415,7 +573,6 @@ const PoolingTable = ({ data =[
           >
             <Input placeholder="Enter master account" />
           </Form.Item>
-
           <Form.Item
             label="Currency"
             name="currency"
@@ -436,11 +593,10 @@ const PoolingTable = ({ data =[
             <Select
               mode="tags"
               placeholder="Enter multiple accounts"
-              tokenSeparators={[","]} // Pressing comma adds a new value
+              tokenSeparators={[","]}
               allowClear
             />
           </Form.Item>
-
           <Form.Item
             label="Status"
             name="status"
@@ -465,7 +621,6 @@ const PoolingTable = ({ data =[
               ]}
             />
           </Form.Item>
-
           <Form.Item
             label="Next Execution"
             name="next_execution"
@@ -535,14 +690,101 @@ const PoolingTable = ({ data =[
         </Form>
       </Modal>
 
+      {/* Filter Modal */}
+      <Modal
+        title="Filters"
+        open={filterModalVisible}
+        onCancel={() => setFilterModalVisible(false)}
+        footer={[
+          <Button key="clear" onClick={resetFilters}>
+            Clear
+          </Button>,
+          <Button
+            key="apply"
+            type="primary"
+            onClick={() => filterForm.submit()}
+          >
+            Apply
+          </Button>,
+        ]}
+      >
+        <Form form={filterForm} layout="vertical" onFinish={handleFilterSubmit}>
+          <Form.Item label="Pool Name" name="poolName">
+            <Input placeholder="Enter Pool Name" />
+          </Form.Item>
+          <Form.Item label="Master Account" name="masterAccount">
+            <Input placeholder="Enter Master Account" />
+          </Form.Item>
+          <Form.Item label="Currency" name="currency">
+            <Input placeholder="Enter Currency" />
+          </Form.Item>
+          <Form.Item label="Participating Accounts" name="participatingAccounts">
+            <Input placeholder="Enter Participating Account" />
+          </Form.Item>
+          <Form.Item label="Status" name="status">
+            <Select
+              placeholder="Select Status"
+              allowClear
+              options={[
+                { value: "Active", label: "Active" },
+                { value: "InActive", label: "InActive" },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item label="Next Execution" name="nextExecution">
+            <DatePicker
+              format="YYYY-MM-DD"
+              style={{ width: "100%" }}
+              placeholder="Select Next Execution Date"
+            />
+          </Form.Item>
+          <Form.Item label="Balance" name="balance">
+            <InputNumber
+              style={{ width: "100%" }}
+              placeholder="Enter Balance"
+            />
+          </Form.Item>
+          <Form.Item label="Liquidity Threshold" name="liquidityThreshold">
+            <InputNumber
+              style={{ width: "100%" }}
+              placeholder="Enter Liquidity Threshold"
+            />
+          </Form.Item>
+          <Form.Item label="Last Pool Update" name="lastPoolUpdate">
+            <DatePicker
+              format="YYYY-MM-DD"
+              style={{ width: "100%" }}
+              placeholder="Select Last Pool Update Date"
+            />
+          </Form.Item>
+          <Form.Item label="Interest Rate(%)" name="interest">
+            <InputNumber
+              style={{ width: "100%" }}
+              placeholder="Enter Interest Rate"
+            />
+          </Form.Item>
+          <Form.Item label="Auto-Rebalancing" name="autoRebalancing">
+            <Select
+              placeholder="Select Auto-Rebalancing"
+              allowClear
+              options={[
+                { value: "yes", label: "Yes" },
+                { value: "enabled", label: "Enabled" },
+                { value: "no", label: "No" },
+              ]}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+
       {/* Pooling Table */}
       <Table
         columns={filteredColumns}
-        dataSource={data.map((record, index) => ({
+        dataSource={filteredData.map((record, index) => ({
           ...record,
-          key: record.id || index, // Ensure key is unique
+          key: record.id || index,
         }))}
-        rowKey="key" // Explicitly tell AntD which field is the unique key
+        rowKey="key"
       />
     </div>
   );

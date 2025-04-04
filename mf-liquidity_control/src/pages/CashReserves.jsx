@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Table, Modal, Button, Form, Input, Select, message, Drawer, InputNumber } from "antd";
+import { Table, Modal, Button, Card, Form, Input, Select, message } from "antd";
 import {
   SettingOutlined,
-  EditOutlined,
-  FilterOutlined,
   MinusSquareOutlined,
   PlusSquareOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import {
   DndContext,
@@ -18,8 +17,8 @@ import {
 import {
   SortableContext,
   verticalListSortingStrategy,
+  useSortable,
   arrayMove,
-  useSortable, // Import useSortable here
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import axios from "axios";
@@ -73,8 +72,15 @@ const allColumns = [
     key: "auto_refill",
     render: (text) => text || "--",
   },
+  {
+    title: "Action",
+    dataIndex: "action",
+    key: "action",
+    render: (text) => text || "--",
+  },
 ];
 
+// Sortable item component
 const SortableItem = ({ column, isChecked, onToggle }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: column.key });
@@ -87,13 +93,15 @@ const SortableItem = ({ column, isChecked, onToggle }) => {
     cursor: "grab",
     display: "flex",
     alignItems: "center",
+    justifyContent: "space-between",
     backgroundColor: isChecked ? "#e6f7ff" : "#f0f0f0",
     borderRadius: 5,
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <Card ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        {/* Toggle between Plus and Minus Icons */}
         {isChecked ? (
           <MinusSquareOutlined
             style={{ color: "red", fontSize: 18, cursor: "pointer" }}
@@ -107,7 +115,7 @@ const SortableItem = ({ column, isChecked, onToggle }) => {
         )}
         <span>{column.title}</span>
       </div>
-    </div>
+    </Card>
   );
 };
 
@@ -146,44 +154,52 @@ const ReservesTable = ({
       "last_updated": [2025, 3, 19, 16, 13, 18, 35422000],
       "auto_refill": "yes"
     }
+  
   ],
-  fetchData,
 }) => {
-  const [selectedColumns, setSelectedColumns] = useState(
-    JSON.parse(localStorage.getItem("selectedColumns")) || allColumns.map((col) => col.key)
-  );
-  const [columnsOrder, setColumnsOrder] = useState(
-    JSON.parse(localStorage.getItem("columnOrder")) || allColumns
-  );
+  // Load preferences from local storage
+  const savedColumns =
+    JSON.parse(localStorage.getItem("selectedColumns")) ||
+    allColumns.map((col) => col.key);
+  const savedOrder =
+    JSON.parse(localStorage.getItem("columnOrder")) || allColumns;
+
+  const [selectedColumns, setSelectedColumns] = useState(savedColumns);
+  const [columnsOrder, setColumnsOrder] = useState(savedOrder);
   const [modalVisible, setModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
-  const [filterDrawerVisible, setFilterDrawerVisible] = useState(false);
-  const [filters, setFilters] = useState({});
-  const [form] = Form.useForm();
 
+  // Persist preferences
   useEffect(() => {
     localStorage.setItem("selectedColumns", JSON.stringify(selectedColumns));
     localStorage.setItem("columnOrder", JSON.stringify(columnsOrder));
   }, [selectedColumns, columnsOrder]);
 
+  // Toggle column visibility
   const handleColumnToggle = (key) => {
-    setSelectedColumns((prevSelectedColumns) =>
-      prevSelectedColumns.includes(key)
-        ? prevSelectedColumns.filter((colKey) => colKey !== key)
-        : [...prevSelectedColumns, key]
-    );
+    setSelectedColumns((prevSelectedColumns) => {
+      const updatedColumns = prevSelectedColumns.includes(key)
+        ? prevSelectedColumns.filter((colKey) => colKey !== key) // Remove column when unchecked
+        : [...prevSelectedColumns, key]; // Add column when checked
+
+      console.log("Updated Columns:", updatedColumns); // Debugging log
+      return updatedColumns;
+    });
   };
 
+  // Reset to default
   const resetToDefault = () => {
     setSelectedColumns(allColumns.map((col) => col.key));
     setColumnsOrder(allColumns);
   };
 
+  // Drag and drop sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor)
   );
 
+  // Handle column reordering
   const handleDragEnd = (event) => {
     const { active, over } = event;
     if (active.id !== over.id) {
@@ -193,32 +209,58 @@ const ReservesTable = ({
     }
   };
 
+  // Filter visible columns
   const filteredColumns = columnsOrder.filter((col) =>
     selectedColumns.includes(col.key)
   );
 
-  const filteredData = data.filter((item) => {
-    return Object.keys(filters).every((key) => {
-      if (!filters[key]) return true;
-      return item[key]?.toString().toLowerCase().includes(filters[key].toLowerCase());
-    });
-  });
+  const [form] = Form.useForm();
 
-  const handleCreateSubmit = async (values) => {
+  const fetchData = async () => {
     try {
-      await axios.post("http://192.168.1.9:9898/save/reserve", values);
-      message.success("Reserve created successfully!");
+      const response = await axios.get(URL);
+      setData(response.data); // Assuming the response data is in the correct format
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      message.error("Failed to fetch data!");
+    }
+  };
+
+  const handleSubmit = async (values) => {
+    try {
+      const response = await axios.post(
+        "http://192.168.1.9:9898/save/cash_reserves",
+        values
+      );
+      console.log(response);
+      message.success("Cash Reserves saved successfully!");
       setCreateModalVisible(false);
       form.resetFields();
+      // Refresh data after successful creation
       fetchData();
     } catch (error) {
-      message.error("Failed to create reserve!");
+      message.error("Failed to save cash reserve!");
     }
+  };
+
+  // Function to reset from default values
+  const resetReserveToDefault = () => {
+    form.setFieldsValue({
+      reserve_name: "",
+      master_account: "",
+      currency: "",
+      reserved_amount: "",
+      minimum_required: "",
+      status: "",
+      last_updated: "",
+      auto_refill: "",
+      action: "",
+    });
   };
 
   return (
     <div style={{ padding: "20px" }}>
-      {/* Filter, Create, and Customize Buttons */}
+      {/* Settings Button */}
       <div
         style={{
           display: "flex",
@@ -227,20 +269,13 @@ const ReservesTable = ({
         }}
       >
         <Button
-          icon={<FilterOutlined />}
-          type="primary"
-          onClick={() => setFilterDrawerVisible(true)}
-        >
-          Filter
-        </Button>
-        <Button
           icon={<EditOutlined />}
           type="primary"
-          style={{ marginLeft: "10px" }}
           onClick={() => setCreateModalVisible(true)}
         >
           Create
         </Button>
+
         <Button
           icon={<SettingOutlined />}
           type="primary"
@@ -250,113 +285,6 @@ const ReservesTable = ({
           Customize
         </Button>
       </div>
-
-      {/* Filter Drawer */}
-      <Drawer
-        title="Filter Reserves"
-        placement="right"
-        onClose={() => setFilterDrawerVisible(false)}
-        open={filterDrawerVisible}
-      >
-        <Form
-          layout="vertical"
-          onValuesChange={(changedValues, allValues) => setFilters(allValues)}
-        >
-          <Form.Item label="Reserve Name" name="reserve_name">
-            <Input placeholder="Enter reserve name" />
-          </Form.Item>
-          <Form.Item label="Master Account" name="master_account">
-            <Input placeholder="Enter master account" />
-          </Form.Item>
-          <Form.Item label="Currency" name="currency">
-            <Input placeholder="Enter currency" />
-          </Form.Item>
-          <Form.Item label="Status" name="status">
-            <Select
-              placeholder="Select status"
-              options={[
-                { value: "Active", label: "Active" },
-                { value: "InActive", label: "InActive" },
-              ]}
-            />
-          </Form.Item>
-        </Form>
-      </Drawer>
-
-      {/* Create Modal */}
-      <Modal
-        title="Create Reserve"
-        open={createModalVisible}
-        onCancel={() => setCreateModalVisible(false)}
-        footer={null}
-      >
-        <Form form={form} layout="vertical" onFinish={handleCreateSubmit}>
-          <Form.Item
-            label="Reserve Name"
-            name="reserve_name"
-            rules={[{ required: true, message: "Please enter reserve name" }]}
-          >
-            <Input placeholder="Enter reserve name" />
-          </Form.Item>
-          <Form.Item
-            label="Master Account"
-            name="master_account"
-            rules={[{ required: true, message: "Please enter master account" }]}
-          >
-            <Input placeholder="Enter master account" />
-          </Form.Item>
-          <Form.Item
-            label="Currency"
-            name="currency"
-            rules={[{ required: true, message: "Please enter currency" }]}
-          >
-            <Input placeholder="Enter currency" />
-          </Form.Item>
-          <Form.Item
-            label="Reserved Amount"
-            name="reserved_amount"
-            rules={[{ required: true, message: "Please enter reserved amount" }]}
-          >
-            <InputNumber
-              style={{ width: "100%" }}
-              min={0}
-              placeholder="Enter reserved amount"
-            />
-          </Form.Item>
-          <Form.Item
-            label="Minimum Required"
-            name="minimum_required"
-            rules={[{ required: true, message: "Please enter minimum required" }]}
-          >
-            <InputNumber
-              style={{ width: "100%" }}
-              min={0}
-              placeholder="Enter minimum required"
-            />
-          </Form.Item>
-          <Form.Item
-            label="Status"
-            name="status"
-            rules={[{ required: true, message: "Please select status" }]}
-          >
-            <Select
-              placeholder="Select status"
-              options={[
-                { value: "Active", label: "Active" },
-                { value: "InActive", label: "InActive" },
-              ]}
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button onClick={() => form.resetFields()} style={{ marginRight: 10 }}>
-              Reset
-            </Button>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
 
       {/* Customization Modal */}
       <Modal
@@ -397,14 +325,116 @@ const ReservesTable = ({
         </DndContext>
       </Modal>
 
+      <Modal
+        title="Create Cash Reserves"
+        open={createModalVisible}
+        onCancel={() => setCreateModalVisible(false)}
+        footer={null}
+      >
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          <Form.Item
+            label="Reserve Name"
+            name="reserve_name"
+            rules={[{ required: true, message: "please enter reserve name" }]}
+          >
+            <Input placeholder="Enter reserve name" />
+          </Form.Item>
+
+          <Form.Item
+            label="Master Account"
+            name="master_account"
+            rules={[{ required: true, message: "please enter Master Account" }]}
+          >
+            <Input placeholder="Enter master account" />
+          </Form.Item>
+
+          <Form.Item
+            label="Currency"
+            name="currency"
+            rules={[{ required: true, message: "please enter Currency " }]}
+          >
+            <Input placeholder="Enter currency " />
+          </Form.Item>
+
+          <Form.Item
+            label="Reserved Amount"
+            name="reserved_amount"
+            rules={[
+              { required: true, message: "please enter Reserved Amount " },
+            ]}
+          >
+            <Input placeholder="Enter reserved amount " />
+          </Form.Item>
+
+          <Form.Item
+            label="Minimum Required"
+            name="minimum_required"
+            rules={[
+              { required: true, message: "please enter Minimum Required" },
+            ]}
+          >
+            <Input placeholder="Enter minimum required" />
+          </Form.Item>
+
+          <Form.Item
+            label="Status"
+            name="status"
+            rules={[{ required: true, message: "please select a Status " }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select an option"
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              options={[
+                { value: "Active", label: "Active" },
+                { value: "InActive", label: "InActive" },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Auto Refill"
+            name="auto_refill"
+            rules={[{ required: true, message: "please enter Auto Refill" }]}
+          >
+            <Select
+              showSearch
+              placeholder="Select an option"
+              filterOption={(input, option) =>
+                (option?.label ?? "")
+                  .toLowerCase()
+                  .includes(input.toLowerCase())
+              }
+              options={[
+                { value: "yes", label: "Yes" },
+                { value: "no", label: "No" },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Button onClick={resetReserveToDefault} style={{ marginRight: 10 }}>
+              Reset to Default
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
       {/* Transactions Table */}
       <Table
         columns={filteredColumns}
-        dataSource={filteredData.map((record, index) => ({
+        dataSource={data.map((record, index) => ({
           ...record,
-          key: record.id || index,
+          key: record.id || index, // Ensure key is unique
         }))}
-        rowKey="key"
+        rowKey="key" // Explicitly tell AntD which field is the unique key
       />
     </div>
   );

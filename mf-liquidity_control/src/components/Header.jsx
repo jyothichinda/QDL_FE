@@ -1,10 +1,10 @@
 import React from "react";
-import { Layout, Avatar, Button } from "antd";
-import { UserOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { Layout, Avatar } from "antd";
+import { UserOutlined } from "@ant-design/icons";
 
 const { Header } = Layout;
 
-const AppHeader = ({ collapsed, setCollapsed }) => {
+const AppHeader = () => {
   return (
     <Header
       style={{
@@ -12,34 +12,11 @@ const AppHeader = ({ collapsed, setCollapsed }) => {
         justifyContent: "space-between",
         alignItems: "center",
         padding: "0 20px",
-        transition: "width 0.3s ease-in-out",
-        background: "#fff", 
-        borderRight: "1px solid #ddd",
-        width: "100%",
+        background: "#001529",
+        color: "#fff",
       }}
     >
-      {collapsed && (
-        <Button
-          type="text"
-          onClick={() => setCollapsed(false)}
-          style={{
-            position: "absolute",
-            top: 16,
-            left: 8, // Adjusted to avoid overlap
-            zIndex: 1001,
-          }}
-        >
-          <MenuUnfoldOutlined style={{ fontSize: "20px" }} />
-        </Button>
-      )}
-      <div
-        style={{
-          marginLeft: "5px",
-          fontSize: "18px",
-          fontWeight: "bold",
-          color: "#fff",
-        }}
-      >
+      <div style={{ fontSize: "18px", fontWeight: "bold", color: "#fff" }}>
         Liquidity Control
       </div>
       <Avatar

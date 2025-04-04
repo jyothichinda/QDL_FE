@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Table, Modal, Button, Card, Form, Input, Select, message } from "antd";
+import { Table, Modal, Button, Form, Input, Select, Drawer, message } from "antd";
 import {
   SettingOutlined,
+  EditOutlined,
+  FilterOutlined,
   MinusSquareOutlined,
   PlusSquareOutlined,
-  EditOutlined,
 } from "@ant-design/icons";
 import {
   DndContext,
@@ -21,108 +22,26 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import axios from "axios";
 
 const allColumns = [
-  {
-    title: "Msg ID",
-    dataIndex: "msg_id",
-    key: "msg_id",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Creation Date Time",
-    dataIndex: "creation_date_time",
-    key: "creation_date_time",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Amount",
-    dataIndex: "amount",
-    key: "amount",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Debtor Name",
-    dataIndex: "debtor_name",
-    key: "debtor_name",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Debtor Address",
-    dataIndex: "debtor_address",
-    key: "debtor_address",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Debtor Agent BIC",
-    dataIndex: "debtor_agent_bic",
-    key: "debtor_agent_bic",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Debtor Account ID",
-    dataIndex: "debtor_account_id",
-    key: "debtor_account_id",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Creditor Name",
-    dataIndex: "creditor_name",
-    key: "creditor_name",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Creditor Address",
-    dataIndex: "creditor_address",
-    key: "creditor_address",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Creditor Agent BIC",
-    dataIndex: "creditor_agent_bic",
-    key: "creditor_agent_bic",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Creditor Account ID",
-    dataIndex: "creditor_account_id",
-    key: "creditor_account_id",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Network Type",
-    dataIndex: "network_type",
-    key: "network_type",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Debtor Bank Name",
-    dataIndex: "debtor_bank_name",
-    key: "debtor_bank_name",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Creditor Bank Name",
-    dataIndex: "creditor_bank_name",
-    key: "creditor_bank_name",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Transaction Date",
-    dataIndex: "transaction_date",
-    key: "transaction_date",
-    render: (text) => text || "--",
-  },
-  {
-    title: "Fraud Status",
-    dataIndex: "fraud_status",
-    key: "fraud_status",
-    render: (text) => text || "--",
-  },
+  { title: "Msg ID", dataIndex: "msg_id", key: "msg_id" },
+  { title: "Creation Date Time", dataIndex: "creation_date_time", key: "creation_date_time" },
+  { title: "Amount", dataIndex: "amount", key: "amount" },
+  { title: "Debtor Name", dataIndex: "debtor_name", key: "debtor_name" },
+  { title: "Debtor Address", dataIndex: "debtor_address", key: "debtor_address" },
+  { title: "Debtor Agent BIC", dataIndex: "debtor_agent_bic", key: "debtor_agent_bic" },
+  { title: "Debtor Account ID", dataIndex: "debtor_account_id", key: "debtor_account_id" },
+  { title: "Creditor Name", dataIndex: "creditor_name", key: "creditor_name" },
+  { title: "Creditor Address", dataIndex: "creditor_address", key: "creditor_address" },
+  { title: "Creditor Agent BIC", dataIndex: "creditor_agent_bic", key: "creditor_agent_bic" },
+  { title: "Creditor Account ID", dataIndex: "creditor_account_id", key: "creditor_account_id" },
+  { title: "Network Type", dataIndex: "network_type", key: "network_type" },
+  { title: "Debtor Bank Name", dataIndex: "debtor_bank_name", key: "debtor_bank_name" },
+  { title: "Creditor Bank Name", dataIndex: "creditor_bank_name", key: "creditor_bank_name" },
+  { title: "Transaction Date", dataIndex: "transaction_date", key: "transaction_date" },
+  { title: "Fraud Status", dataIndex: "fraud_status", key: "fraud_status" },
 ];
 
-// Sortable item component
 const SortableItem = ({ column, isChecked, onToggle }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: column.key });
@@ -139,11 +58,10 @@ const SortableItem = ({ column, isChecked, onToggle }) => {
     backgroundColor: isChecked ? "#e6f7ff" : "#f0f0f0",
     borderRadius: 5,
   };
-  
+
   return (
-    <Card ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        {/* Toggle between Plus and Minus Icons */}
         {isChecked ? (
           <MinusSquareOutlined
             style={{ color: "red", fontSize: 18, cursor: "pointer" }}
@@ -157,47 +75,47 @@ const SortableItem = ({ column, isChecked, onToggle }) => {
         )}
         <span>{column.title}</span>
       </div>
-    </Card>
+    </div>
   );
 };
 
-const AnamolyDetectionTable = ({
-  data =  [
+const AnamolyDetectionTable = () => {
+  const data = [
     {
-        "msg_id": "MSGIDDK00034",
-        "creation_date_time": "2025-03-27 10:35:00",
-        "amount": 1125887.34,
-        "debtor_name": "NovaMatrix Technologies",
-        "debtor_address": "MECKENEMSTRASSE 10 46395 BOCHOLT GERMANY",
-        "debtor_agent_bic": "BOVBDE8H",
-        "debtor_account_id": "DE84295337706984956921",
-        "creditor_name": "QuantumTech Systems",
-        "creditor_address": "C/ JOSE MARIA OLABARRI 1 48001 BILBAO SPAIN",
-        "creditor_agent_bic": "BPFEES73",
-        "creditor_account_id": "ES3090357547846647899565",
-        "network_type": "ACH",
-        "debtor_bank_name": "Wells FargoCo",
-        "creditor_bank_name": "Bank of Bavaria",
-        "transaction_date": "2025-03-26 05:17:00",
-        "fraud_status": "Non Suspicious"
-      },
+      msg_id: "MSGIDDK00034",
+      creation_date_time: "2025-03-27 10:35:00",
+      amount: 1125887.34,
+      debtor_name: "NovaMatrix Technologies",
+      debtor_address: "MECKENEMSTRASSE 10 46395 BOCHOLT GERMANY",
+      debtor_agent_bic: "BOVBDE8H",
+      debtor_account_id: "DE84295337706984956921",
+      creditor_name: "QuantumTech Systems",
+      creditor_address: "C/ JOSE MARIA OLABARRI 1 48001 BILBAO SPAIN",
+      creditor_agent_bic: "BPFEES73",
+      creditor_account_id: "ES3090357547846647899565",
+      network_type: "ACH",
+      debtor_bank_name: "Wells FargoCo",
+      creditor_bank_name: "Bank of Bavaria",
+      transaction_date: "2025-03-26 05:17:00",
+      fraud_status: "Non Suspicious",
+    },
     {
-      "msg_id": "MSGIDDK00035",
-      "creation_date_time": "2025-03-27 11:00:00",
-      "amount": 2500000.00,
-      "debtor_name": "TechVision Ltd",
-      "debtor_address": "123 Silicon Avenue, San Jose, CA, USA",
-      "debtor_agent_bic": "CHASUS33",
-      "debtor_account_id": "US6758493023847658493",
-      "creditor_name": "AI Global Solutions",
-      "creditor_address": "56 Innovation Road, London, UK",
-      "creditor_agent_bic": "HSBCGB2L",
-      "creditor_account_id": "GB29NWBK60161331926819",
-      "network_type": "SWIFT",
-      "debtor_bank_name": "JPMorgan Chase",
-      "creditor_bank_name": "HSBC Bank",
-      "transaction_date": "2025-03-26 09:15:00",
-      "fraud_status": "Suspicious"
+      msg_id: "MSGIDDK00035",
+      creation_date_time: "2025-03-27 11:00:00",
+      amount: 2500000.0,
+      debtor_name: "TechVision Ltd",
+      debtor_address: "123 Silicon Avenue, San Jose, CA, USA",
+      debtor_agent_bic: "CHASUS33",
+      debtor_account_id: "US6758493023847658493",
+      creditor_name: "AI Global Solutions",
+      creditor_address: "56 Innovation Road, London, UK",
+      creditor_agent_bic: "HSBCGB2L",
+      creditor_account_id: "GB29NWBK60161331926819",
+      network_type: "SWIFT",
+      debtor_bank_name: "JPMorgan Chase",
+      creditor_bank_name: "HSBC Bank",
+      transaction_date: "2025-03-26 09:15:00",
+      fraud_status: "Suspicious",
     },
     {
       "msg_id": "MSGIDDK00036",
@@ -272,9 +190,8 @@ const AnamolyDetectionTable = ({
       "fraud_status": "Suspicious"
     }
   ]
-  
-}) => {
-  // Load preferences from local storage
+    
+
   const savedColumns =
     JSON.parse(localStorage.getItem("selectedColumns")) ||
     allColumns.map((col) => col.key);
@@ -285,38 +202,33 @@ const AnamolyDetectionTable = ({
   const [columnsOrder, setColumnsOrder] = useState(savedOrder);
   const [modalVisible, setModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [filterDrawerVisible, setFilterDrawerVisible] = useState(false);
+  const [filters, setFilters] = useState({});
+  const [form] = Form.useForm();
 
-  // Persist preferences
   useEffect(() => {
     localStorage.setItem("selectedColumns", JSON.stringify(selectedColumns));
     localStorage.setItem("columnOrder", JSON.stringify(columnsOrder));
   }, [selectedColumns, columnsOrder]);
 
-  // Toggle column visibility
   const handleColumnToggle = (key) => {
-    setSelectedColumns((prevSelectedColumns) => {
-      const updatedColumns = prevSelectedColumns.includes(key)
-        ? prevSelectedColumns.filter((colKey) => colKey !== key) // Remove column when unchecked
-        : [...prevSelectedColumns, key]; // Add column when checked
-
-      console.log("Updated Columns:", updatedColumns); // Debugging log
-      return updatedColumns;
-    });
+    setSelectedColumns((prevSelectedColumns) =>
+      prevSelectedColumns.includes(key)
+        ? prevSelectedColumns.filter((colKey) => colKey !== key)
+        : [...prevSelectedColumns, key]
+    );
   };
 
-  // Reset to default
   const resetToDefault = () => {
     setSelectedColumns(allColumns.map((col) => col.key));
     setColumnsOrder(allColumns);
   };
 
-  // Drag and drop sensors
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor)
   );
 
-  // Handle column reordering
   const handleDragEnd = (event) => {
     const { active, over } = event;
     if (active.id !== over.id) {
@@ -326,65 +238,25 @@ const AnamolyDetectionTable = ({
     }
   };
 
-  // Filter visible columns
   const filteredColumns = columnsOrder.filter((col) =>
     selectedColumns.includes(col.key)
   );
 
-  const [form] = Form.useForm();
-
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(URL);
-      setData(response.data); // Assuming the response data is in the correct format
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      message.error("Failed to fetch data!");
-    }
-  };
-
-  const handleSubmit = async (values) => {
-    try {
-      const response = await axios.post(
-        "http://192.168.1.9:9898/save/cash_reserves",
-        values
-      );
-      console.log(response);
-      message.success("Cash Reserves saved successfully!");
-      setCreateModalVisible(false);
-      form.resetFields();
-      // Refresh data after successful creation
-      fetchData();
-    } catch (error) {
-      message.error("Failed to save cash reserve!");
-    }
-  };
-
-  // Function to reset from default values
-  const resetReserveToDefault = () => {
-    form.setFieldsValue({
-        msg_id: "",
-      creation_date_time: "",
-      amount: "",
-      reserved_amount: "",
-      debtor_address: "",
-      debtor_agent_bic: "",
-      debtor_account_id: "",
-      creditor_name: "",
-      creditor_address: "",
-      creditor_agent_bic: "",
-      creditor_account_id: "",
-      network_type: "",
-      debtor_bank_name: "",
-      creditor_bank_name: "",
-      transaction_date: "",
-      fraud_status: "",
+  const filteredData = data.filter((item) => {
+    return Object.keys(filters).every((key) => {
+      if (!filters[key]) return true;
+      return item[key]?.toString().toLowerCase().includes(filters[key].toLowerCase());
     });
+  });
+
+  const handleCreateSubmit = (values) => {
+    message.success("Anomaly record created successfully!");
+    form.resetFields();
+    setCreateModalVisible(false);
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      {/* Settings Button */}
+    <div>
       <div
         style={{
           display: "flex",
@@ -393,13 +265,20 @@ const AnamolyDetectionTable = ({
         }}
       >
         <Button
+          icon={<FilterOutlined />}
+          type="primary"
+          onClick={() => setFilterDrawerVisible(true)}
+        >
+          Filter
+        </Button>
+        <Button
           icon={<EditOutlined />}
           type="primary"
+          style={{ marginLeft: "10px" }}
           onClick={() => setCreateModalVisible(true)}
         >
           Create
         </Button>
-
         <Button
           icon={<SettingOutlined />}
           type="primary"
@@ -410,7 +289,100 @@ const AnamolyDetectionTable = ({
         </Button>
       </div>
 
-      {/* Customization Modal */}
+      <Drawer
+        title="Filter Anomalies"
+        placement="right"
+        onClose={() => setFilterDrawerVisible(false)}
+        open={filterDrawerVisible}
+      >
+        <Form
+          layout="vertical"
+          onValuesChange={(changedValues, allValues) => setFilters(allValues)}
+        >
+          <Form.Item label="Msg ID" name="msg_id">
+            <Input placeholder="Enter Msg ID" />
+          </Form.Item>
+          <Form.Item label="Debtor Name" name="debtor_name">
+            <Input placeholder="Enter Debtor Name" />
+          </Form.Item>
+          <Form.Item label="Creditor Name" name="creditor_name">
+            <Input placeholder="Enter Creditor Name" />
+          </Form.Item>
+          <Form.Item label="Fraud Status" name="fraud_status">
+            <Select
+              placeholder="Select Fraud Status"
+              options={[
+                { value: "Non Suspicious", label: "Non Suspicious" },
+                { value: "Suspicious", label: "Suspicious" },
+                { value: "Under Investigation", label: "Under Investigation" },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item label="Network Type" name="network_type">
+            <Select
+              placeholder="Select Network Type"
+              options={[
+                { value: "ACH", label: "ACH" },
+                { value: "SWIFT", label: "SWIFT" },
+              ]}
+            />
+          </Form.Item>
+        </Form>
+      </Drawer>
+
+      <Modal
+        title="Create Anomaly Record"
+        open={createModalVisible}
+        onCancel={() => setCreateModalVisible(false)}
+        footer={null}
+      >
+        <Form form={form} layout="vertical" onFinish={handleCreateSubmit}>
+          <Form.Item
+            label="Msg ID"
+            name="msg_id"
+            rules={[{ required: true, message: "Please enter Msg ID" }]}
+          >
+            <Input placeholder="Enter Msg ID" />
+          </Form.Item>
+          <Form.Item
+            label="Debtor Name"
+            name="debtor_name"
+            rules={[{ required: true, message: "Please enter Debtor Name" }]}
+          >
+            <Input placeholder="Enter Debtor Name" />
+          </Form.Item>
+          <Form.Item
+            label="Creditor Name"
+            name="creditor_name"
+            rules={[{ required: true, message: "Please enter Creditor Name" }]}
+          >
+            <Input placeholder="Enter Creditor Name" />
+          </Form.Item>
+          <Form.Item
+            label="Fraud Status"
+            name="fraud_status"
+            rules={[{ required: true, message: "Please select Fraud Status" }]}
+          >
+            <Select
+              placeholder="Select Fraud Status"
+              options={[
+                { value: "Non Suspicious", label: "Non Suspicious" },
+                { value: "Suspicious", label: "Suspicious" },
+                { value: "Under Investigation", label: "Under Investigation" },
+              ]}
+            />
+          </Form.Item>
+          <Form.Item>
+            <Button onClick={() => form.resetFields()} style={{ marginRight: 10 }}>
+              Reset
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
       <Modal
         title="Customize Columns"
         open={modalVisible}
@@ -449,116 +421,13 @@ const AnamolyDetectionTable = ({
         </DndContext>
       </Modal>
 
-      <Modal
-        title="Create Cash Reserves"
-        open={createModalVisible}
-        onCancel={() => setCreateModalVisible(false)}
-        footer={null}
-      >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <Form.Item
-            label="Message ID"
-            name="msg_id"
-            rules={[{ required: true, message: "please enter reserve name" }]}
-          >
-            <Input placeholder="Enter reserve name" />
-          </Form.Item>
-
-          <Form.Item
-            label="creation_date_time"
-            name="creation_date_time"
-            rules={[{ required: true, message: "please enter Master Account" }]}
-          >
-            <Input placeholder="Enter master account" />
-          </Form.Item>
-
-          <Form.Item
-            label="amount"
-            name="amount"
-            rules={[{ required: true, message: "please enter Amount " }]}
-          >
-            <Input placeholder="Enter Amount " />
-          </Form.Item>
-
-          <Form.Item
-            label="Debtor Name"
-            name="debtor_name"
-            rules={[
-              { required: true, message: "please enter Debtor Name " },
-            ]}
-          >
-            <Input placeholder="Enter Debtor Name " />
-          </Form.Item>
-
-          <Form.Item
-            label="Debtor Address"
-            name="debtor_address"
-            rules={[
-              { required: true, message: "please enter Minimum Required" },
-            ]}
-          >
-            <Input placeholder="Enter minimum required" />
-          </Form.Item>
-
-          <Form.Item
-            label="Debtor Agent BIC"
-            name="debtor_agent_bic"
-            rules={[{ required: true, message: "please select a Debtor Agent BIC " }]}
-          >
-            <Select
-              showSearch
-              placeholder="Select an option"
-              filterOption={(input, option) =>
-                (option?.label ?? "")
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-              options={[
-                { value: "Active", label: "Active" },
-                { value: "InActive", label: "InActive" },
-              ]}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label="Creditor Name"
-            name="creditor_name"
-            rules={[{ required: true, message: "please enter Creditor Name" }]}
-          >
-            <Select
-              showSearch
-              placeholder="Select an option"
-              filterOption={(input, option) =>
-                (option?.label ?? "")
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-              options={[
-                { value: "yes", label: "Yes" },
-                { value: "no", label: "No" },
-              ]}
-            />
-          </Form.Item>
-
-          <Form.Item>
-            <Button onClick={resetReserveToDefault} style={{ marginRight: 10 }}>
-              Reset to Default
-            </Button>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* Transactions Table */}
       <Table
         columns={filteredColumns}
-        dataSource={data.map((record, index) => ({
+        dataSource={filteredData.map((record, index) => ({
           ...record,
-          key: record.id || index, // Ensure key is unique
+          key: record.msg_id || index,
         }))}
-        rowKey="key" // Explicitly tell AntD which field is the unique key
+        rowKey="key"
       />
     </div>
   );

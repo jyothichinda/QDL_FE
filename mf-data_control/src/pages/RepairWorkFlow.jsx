@@ -3,7 +3,7 @@ import { Table, Modal, Button, Card } from "antd";
 import { SettingOutlined, MinusSquareOutlined, PlusSquareOutlined } from "@ant-design/icons";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
-import { data } from "../utils/dummydata";
+import data from "../utils/dummydata";
 
 const allColumns = [
   { title: "Transaction Id", dataIndex: "transactionId", key: "transactionId" },
@@ -54,6 +54,21 @@ const RepairWorkFlowTable = () => {
 
   const filteredColumns = columnsOrder.filter((col) => selectedColumns.includes(col.key));
 
+  const tableData = Array.isArray(data.paymentFiles)
+    ? data.paymentFiles.map((record, index) => ({
+        key: record.id || index,
+        transactionId: record.transactionId || "--",
+        customerName: record.customerName || "--",
+        messageId: record.messageId || "--",
+        transactionAmount: record.transactionAmount || "--",
+        appliedRules: record.appliedRules || "--",
+        status: record.status || "--",
+        lastUpdated: record.lastUpdated || "--",
+        autoRefill: record.autoRefill || "--",
+        action: record.action || "--",
+      }))
+    : [];
+
   return (
     <div style={{ padding: "20px" }}>
       <Button icon={<SettingOutlined />} type="primary" onClick={() => setModalVisible(true)}>
@@ -89,7 +104,7 @@ const RepairWorkFlowTable = () => {
 
       <Table
         columns={filteredColumns}
-        dataSource={data.map((record, index) => ({ ...record, key: record.id || index }))}
+        dataSource={tableData}
         rowKey="key"
       />
     </div>
